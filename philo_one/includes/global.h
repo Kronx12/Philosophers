@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:09:38 by gbaud             #+#    #+#             */
-/*   Updated: 2020/11/25 02:33:35 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/11/25 16:12:43 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,12 +32,20 @@ typedef struct		s_philo
 	pthread_t		thread;
 	long			eat;
 	long			ttd;
+	long			ittd;
+	long			itte;
+	long			itts;
 	int				id;
+	int				nop;
+	pthread_mutex_t	*mutex;
+	pthread_mutex_t	*mutex_lock;
+	pthread_mutex_t	*fork;
 }					t_philo;
 
 typedef struct		s_simulation
 {
 	int				nop;
+	int				now;
 	long			ttd;
 	long			tte;
 	long			tts;
@@ -129,6 +137,21 @@ void				*run(void *p);
 **  @param int i
 **  @return None
 */
-void log_died(int i);
+void				log_died(t_simulation *simulation, int i);
+
+/*
+**  @brief Log philosopher end
+**  @param t_simulation *simulation
+**  @return None
+*/
+void log_end(t_simulation *simulation);
+
+/*
+**  @brief Log philosopher
+**  @param t_philo *philo
+**  @param char *str
+**  @return None
+*/
+int             	log_action(t_philo *philo, char *str);
 
 #endif

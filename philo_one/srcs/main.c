@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:10:24 by gbaud             #+#    #+#             */
-/*   Updated: 2020/11/25 02:37:06 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/11/25 16:15:34 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -40,18 +40,33 @@ int init_parameters(int ac, char **av, t_simulation *simulation)
 void	check_life(t_simulation *simulation)
 {
 	int i;
+	int j;
 
 	while (1)
 	{
 		i = -1;
+		j = 0;
 		while (++i < simulation->nop)
-			if (compare_time(simulation->philo[i].ttd))
+		{
+			if (!simulation->philo[i].eat)
+				j++;
+			if (simulation->philo[i].ttd >= 0 && compare_time(simulation->philo[i].ttd))
 			{
+				log_died(simulation, i);
 				i = -1;
 				while (++i < simulation->nop)
 					pthread_kill(simulation->philo[i].thread, 0);
-				log_died(i);
+    			exit(EXIT_SUCCESS);
 			}
+		}
+		if (j == simulation->max)
+		{
+			log_end(simulation);
+			i = -1;
+			while (++i < simulation->nop)
+				pthread_kill(simulation->philo[i].thread, 0);
+    		exit(EXIT_SUCCESS);
+		}
 	}
 }
 
@@ -70,10 +85,17 @@ int main(int ac, char **av)
 	while (++i < simulation.nop)
 	{
 		simulation.philo[i].id = i;
-		simulation.philo[i].ttd = simulation.ttd;
+		simulation.philo[i].ttd = get_time_ms() + simulation.ttd;
 		simulation.philo[i].eat = simulation.max;
 		if (pthread_mutex_init(&simulation.fork[i], NULL))
 			error("Erreur de mutex", ALLOCATION);
+		simulation.philo[i].mutex = &simulation.mutex;
+		simulation.philo[i].mutex_lock = &simulation.mutex_lock;
+		simulation.philo[i].fork = simulation.fork;
+		simulation.philo[i].nop = simulation.nop;
+		simulation.philo[i].ittd = simulation.ttd;
+		simulation.philo[i].itte = simulation.tte;
+		simulation.philo[i].itts = simulation.tts;
 		pthread_create(&simulation.philo[i].thread, NULL, run, &simulation.philo[i]);
 		pthread_detach(simulation.philo[i].thread);
 		pthread_join(simulation.philo[i].thread, NULL);
