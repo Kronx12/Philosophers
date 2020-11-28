@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@student.42lyon.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:10:24 by gbaud             #+#    #+#             */
-/*   Updated: 2020/11/25 16:15:34 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/11/28 02:19:31 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,21 +50,15 @@ void	check_life(t_simulation *simulation)
 		{
 			if (!simulation->philo[i].eat)
 				j++;
-			if (simulation->philo[i].ttd >= 0 && compare_time(simulation->philo[i].ttd))
+			if (simulation->philo[i].eat && simulation->philo[i].ttd >= 0 && compare_time(simulation->philo[i].ttd))
 			{
 				log_died(simulation, i);
-				i = -1;
-				while (++i < simulation->nop)
-					pthread_kill(simulation->philo[i].thread, 0);
     			exit(EXIT_SUCCESS);
 			}
 		}
-		if (j == simulation->max)
+		if (j == simulation->nop)
 		{
 			log_end(simulation);
-			i = -1;
-			while (++i < simulation->nop)
-				pthread_kill(simulation->philo[i].thread, 0);
     		exit(EXIT_SUCCESS);
 		}
 	}
