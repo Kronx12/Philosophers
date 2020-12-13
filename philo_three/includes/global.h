@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:09:38 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:45:59 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/13 04:46:15 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,6 +16,8 @@
 # include <pthread.h>
 # include <unistd.h>
 # include <stdlib.h>
+# include <fcntl.h>
+# include <semaphore.h>
 
 typedef enum		e_error
 {
@@ -34,9 +36,9 @@ typedef struct		s_philo
 	long			itts;
 	int				id;
 	int				nop;
-	pthread_mutex_t	*mutex;
-	pthread_mutex_t	*mutex_lock;
-	pthread_mutex_t	*fork;
+	sem_t			*mutex;
+	sem_t			*mutex_lock;
+	sem_t			*fork;
 }					t_philo;
 
 typedef struct		s_simulation
@@ -48,9 +50,9 @@ typedef struct		s_simulation
 	long			tts;
 	long			max;
 	long			start;
-	pthread_mutex_t	mutex;
-	pthread_mutex_t	mutex_lock;
-	pthread_mutex_t	*fork;
+	sem_t			*mutex;
+	sem_t			*mutex_lock;
+	sem_t			*fork;
 	t_philo			*philo;
 }					t_simulation;
 
@@ -102,7 +104,7 @@ t_bool				allisdigit(char *str);
 int					error(char *err, t_error type);
 
 /*
-**  @brief Free all mutex
+**  @brief Free all semaphore
 **  @param t_simulation simulation
 **  @return EXIT_SUCCESS
 */

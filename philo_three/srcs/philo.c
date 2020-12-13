@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/25 00:16:20 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:46:07 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/13 04:46:21 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,18 +14,18 @@
 
 void	take_fork(t_philo *p)
 {
-	pthread_mutex_lock(p->mutex_lock);
-	pthread_mutex_lock(&p->fork[p->id]);
+	sem_wait(p->mutex_lock);
+	sem_wait(p->fork);
 	log_action(p, "is taken a fork");
-	pthread_mutex_lock(&p->fork[(p->id + 1) % p->nop]);
+	sem_wait(p->fork);
 	log_action(p, "is taken a fork");
-	pthread_mutex_unlock(p->mutex_lock);
+	sem_post(p->mutex_lock);
 }
 
 void	free_fork(t_philo *p)
 {
-	pthread_mutex_unlock(&p->fork[p->id]);
-	pthread_mutex_unlock(&p->fork[(p->id + 1) % p->nop]);
+	sem_post(p->fork);
+	sem_post(p->fork);
 }
 
 void	philo_eat(t_philo *p)

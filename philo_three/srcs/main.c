@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:10:24 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:46:32 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/13 04:46:19 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,6 +84,7 @@ void	setup_loop(t_simulation *simulation)
 						&simulation->philo[i]);
 		pthread_detach(simulation->philo[i].thread);
 		pthread_join(simulation->philo[i].thread, NULL);
+		
 	}
 }
 
