@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:10:24 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:25:25 by gbaud            ###   ########.fr       */
+/*   Updated: 2020/12/13 04:17:55 by gbaud            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -31,8 +31,6 @@ int		init_parameters(int ac, char **av, t_simulation *simulation)
 		simulation->max = ft_atoi(av[5]);
 	simulation->start = get_time_ms();
 	if (!(simulation->philo = malloc(sizeof(t_philo) * simulation->nop)))
-		error("Malloc error", ALLOCATION);
-	if (!(simulation->fork = malloc(sizeof(pthread_mutex_t) * simulation->nop)))
 		error("Malloc error", ALLOCATION);
 	return (0);
 }
@@ -75,10 +73,8 @@ void	setup_loop(t_simulation *simulation)
 		simulation->philo[i].id = i;
 		simulation->philo[i].ttd = get_time_ms() + simulation->ttd;
 		simulation->philo[i].eat = simulation->max;
-		if (pthread_mutex_init(&simulation->fork[i], NULL))
-			error("Erreur de mutex", ALLOCATION);
-		simulation->philo[i].mutex = &simulation->mutex;
-		simulation->philo[i].mutex_lock = &simulation->mutex_lock;
+		simulation->philo[i].mutex = simulation->mutex;
+		simulation->philo[i].mutex_lock = simulation->mutex_lock;
 		simulation->philo[i].fork = simulation->fork;
 		simulation->philo[i].nop = simulation->nop;
 		simulation->philo[i].ittd = simulation->ttd;
@@ -97,10 +93,18 @@ int		main(int ac, char **av)
 
 	init_parameters(ac, av, &simulation);
 	printf_parameters(simulation);
-	if (pthread_mutex_init(&simulation.mutex, NULL))
-		error("Erreur de mutex", ALLOCATION);
-	if (pthread_mutex_init(&simulation.mutex_lock, NULL))
-		error("Erreur de mutex", ALLOCATION);
+	sem_unlink("/sem-mutex");
+	if ((simulation.mutex =
+		sem_open("/sem-mutex", O_CREAT, 0660, 1)) == SEM_FAILED)
+		error("Erreur de semaphore", ALLOCATION);
+	sem_unlink("/sem-mutexlock");
+	if ((simulation.mutex_lock =
+		sem_open("/sem-mutexlock", O_CREAT, 0660, 1)) == SEM_FAILED)
+		error("Erreur de semaphore", ALLOCATION);
+	sem_unlink("/sem-fork");
+	if ((simulation.fork =
+		sem_open("/sem-fork", O_CREAT, 0660, simulation.nop)) == SEM_FAILED)
+		error("Erreur de semaphore", ALLOCATION);
 	setup_loop(&simulation);
 	check_life(&simulation);
 	return (0);

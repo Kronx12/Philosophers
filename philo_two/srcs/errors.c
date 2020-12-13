@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:46:48 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:29:06 by gbaud            ###   ########.fr       */
+/*   Updated: 2020/12/13 04:18:50 by gbaud            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,14 +50,9 @@ void	printf_parameters(t_simulation simulation)
 
 void	clean_exit(t_simulation *simulation)
 {
-	int i;
-
-	i = -1;
-	while (++i < simulation->nop)
-		pthread_mutex_destroy(simulation->philo[i].fork);
-	pthread_mutex_destroy(&simulation->mutex);
-	pthread_mutex_destroy(&simulation->mutex_lock);
+	sem_close(simulation->mutex);
+	sem_close(simulation->mutex_lock);
+	sem_close(simulation->fork);
 	free(simulation->philo);
-	free(simulation->fork);
 	exit(EXIT_SUCCESS);
 }
