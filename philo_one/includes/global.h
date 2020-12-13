@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   global.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gbaud <gbaud@student.42lyon.fr>            +#+  +:+       +#+        */
+/*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:09:38 by gbaud             #+#    #+#             */
-/*   Updated: 2020/11/25 16:12:43 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/13 03:27:27 by gbaud            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,6 @@
 # include <pthread.h>
 # include <unistd.h>
 # include <stdlib.h>
-
-// TODO REMOVE
-# include <stdio.h>
 
 typedef enum		e_error
 {
@@ -57,9 +54,9 @@ typedef struct		s_simulation
 	t_philo			*philo;
 }					t_simulation;
 
-# define TRUE		1
-# define FALSE		0 
 typedef int			t_bool;
+# define TRUE		1
+# define FALSE		0
 
 /*
 **  @brief Convert String to Number
@@ -144,7 +141,7 @@ void				log_died(t_simulation *simulation, int i);
 **  @param t_simulation *simulation
 **  @return None
 */
-void log_end(t_simulation *simulation);
+void				log_end(t_simulation *simulation);
 
 /*
 **  @brief Log philosopher
@@ -152,6 +149,6 @@ void log_end(t_simulation *simulation);
 **  @param char *str
 **  @return None
 */
-int             	log_action(t_philo *philo, char *str);
+int					log_action(t_philo *philo, char *str);
 
 #endif

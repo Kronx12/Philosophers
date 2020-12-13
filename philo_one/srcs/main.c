@@ -3,16 +3,16 @@
 /*                                                        :::      ::::::::   */
 /*   main.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: gbaud <gbaud@student.42lyon.fr>            +#+  +:+       +#+        */
+/*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:10:24 by gbaud             #+#    #+#             */
-/*   Updated: 2020/11/28 02:19:31 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/13 03:23:31 by gbaud            ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/global.h"
 
-int init_parameters(int ac, char **av, t_simulation *simulation)
+int		init_parameters(int ac, char **av, t_simulation *simulation)
 {
 	int i;
 
@@ -20,8 +20,8 @@ int init_parameters(int ac, char **av, t_simulation *simulation)
 	if (ac < 5 || ac > 6)
 		error("Not valid parameters count", ARGUMENT);
 	while (++i < ac)
-	    if (!allisdigit(av[i]))
-	        error("Parameters must be numbers", ARGUMENT);
+		if (!allisdigit(av[i]))
+			error("Parameters must be numbers", ARGUMENT);
 	simulation->nop = ft_atoi(av[1]);
 	simulation->ttd = ft_atoi(av[2]);
 	simulation->tte = ft_atoi(av[3]);
@@ -50,50 +50,58 @@ void	check_life(t_simulation *simulation)
 		{
 			if (!simulation->philo[i].eat)
 				j++;
-			if (simulation->philo[i].eat && simulation->philo[i].ttd >= 0 && compare_time(simulation->philo[i].ttd))
+			if (simulation->philo[i].eat && simulation->philo[i].ttd >= 0 &&
+				compare_time(simulation->philo[i].ttd))
 			{
 				log_died(simulation, i);
-    			exit(EXIT_SUCCESS);
+				exit(EXIT_SUCCESS);
 			}
 		}
 		if (j == simulation->nop)
 		{
 			log_end(simulation);
-    		exit(EXIT_SUCCESS);
+			exit(EXIT_SUCCESS);
 		}
 	}
 }
 
-int main(int ac, char **av)
+void	setup_loop(t_simulation *simulation)
 {
-	int i;
-	t_simulation simulation;
+	int	i;
+
+	i = -1;
+	while (++i < simulation->nop)
+	{
+		simulation->philo[i].id = i;
+		simulation->philo[i].ttd = get_time_ms() + simulation->ttd;
+		simulation->philo[i].eat = simulation->max;
+		if (pthread_mutex_init(&simulation->fork[i], NULL))
+			error("Erreur de mutex", ALLOCATION);
+		simulation->philo[i].mutex = &simulation->mutex;
+		simulation->philo[i].mutex_lock = &simulation->mutex_lock;
+		simulation->philo[i].fork = simulation->fork;
+		simulation->philo[i].nop = simulation->nop;
+		simulation->philo[i].ittd = simulation->ttd;
+		simulation->philo[i].itte = simulation->tte;
+		simulation->philo[i].itts = simulation->tts;
+		pthread_create(&simulation->philo[i].thread, NULL, run,
+						&simulation->philo[i]);
+		pthread_detach(simulation->philo[i].thread);
+		pthread_join(simulation->philo[i].thread, NULL);
+	}
+}
+
+int		main(int ac, char **av)
+{
+	t_simulation	simulation;
 
 	init_parameters(ac, av, &simulation);
 	printf_parameters(simulation);
 	if (pthread_mutex_init(&simulation.mutex, NULL))
-        error("Erreur de mutex", ALLOCATION);
-    if (pthread_mutex_init(&simulation.mutex_lock, NULL))
-        error("Erreur de mutex", ALLOCATION);	
-	i = -1;
-	while (++i < simulation.nop)
-	{
-		simulation.philo[i].id = i;
-		simulation.philo[i].ttd = get_time_ms() + simulation.ttd;
-		simulation.philo[i].eat = simulation.max;
-		if (pthread_mutex_init(&simulation.fork[i], NULL))
-			error("Erreur de mutex", ALLOCATION);
-		simulation.philo[i].mutex = &simulation.mutex;
-		simulation.philo[i].mutex_lock = &simulation.mutex_lock;
-		simulation.philo[i].fork = simulation.fork;
-		simulation.philo[i].nop = simulation.nop;
-		simulation.philo[i].ittd = simulation.ttd;
-		simulation.philo[i].itte = simulation.tte;
-		simulation.philo[i].itts = simulation.tts;
-		pthread_create(&simulation.philo[i].thread, NULL, run, &simulation.philo[i]);
-		pthread_detach(simulation.philo[i].thread);
-		pthread_join(simulation.philo[i].thread, NULL);
-	}
+		error("Erreur de mutex", ALLOCATION);
+	if (pthread_mutex_init(&simulation.mutex_lock, NULL))
+		error("Erreur de mutex", ALLOCATION);
+	setup_loop(&simulation);
 	check_life(&simulation);
 	return (0);
 }
