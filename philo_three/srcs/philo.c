@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/25 00:16:20 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:46:21 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/14 06:31:26 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,6 +47,9 @@ void	*run(void *s)
 	t_philo	*philo;
 
 	philo = (t_philo *)s;
+	pthread_create(&philo->thread, NULL, loop_check, philo);
+	pthread_detach(philo->thread);
+	pthread_join(philo->thread, NULL);
 	while (philo->eat != 0)
 	{
 		take_fork(philo);
@@ -57,5 +60,5 @@ void	*run(void *s)
 	}
 	philo->ttd = -1;
 	free_fork(philo);
-	return (NULL);
+	exit(0);
 }

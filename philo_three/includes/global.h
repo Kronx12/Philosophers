@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:09:38 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:46:15 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/14 06:31:49 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,8 @@
 # include <stdlib.h>
 # include <fcntl.h>
 # include <semaphore.h>
+# include <sys/wait.h>
+# include <signal.h>
 
 typedef enum		e_error
 {
@@ -50,6 +52,7 @@ typedef struct		s_simulation
 	long			tts;
 	long			max;
 	long			start;
+	pid_t			*pid;
 	sem_t			*mutex;
 	sem_t			*mutex_lock;
 	sem_t			*fork;
@@ -159,5 +162,12 @@ void				log_end(t_simulation *simulation);
 **  @return None
 */
 int					log_action(t_philo *philo, char *str);
+
+/*
+**  @brief Loop and exit if dead
+**  @param void *p
+**  @return None
+*/
+void				*loop_check(void *p);
 
 #endif

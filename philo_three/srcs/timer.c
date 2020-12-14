@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 08:43:17 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:46:23 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/14 06:27:07 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,5 +22,7 @@ long	get_time_ms(void)
 
 int		compare_time(long time)
 {
+	if (time == -1)
+		return (0);
 	return (time < get_time_ms());
 }

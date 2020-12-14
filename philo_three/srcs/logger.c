@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/25 02:25:59 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:46:18 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/14 06:27:06 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,4 +42,15 @@ int		log_action(t_philo *philo, char *str)
 	ft_putchar('\n');
 	sem_post(philo->mutex);
 	return (1);
+}
+
+void	*loop_check(void *p)
+{
+	t_philo *philo;
+
+	philo = (t_philo *)p;
+	while (1)
+		if (compare_time(philo->ttd))
+			exit(1);
+	return (NULL);
 }

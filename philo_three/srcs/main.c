@@ -6,7 +6,7 @@
 /*   By: gbaud <gbaud@42lyon.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/11/24 15:10:24 by gbaud             #+#    #+#             */
-/*   Updated: 2020/12/13 04:46:19 by gbaud            ###   ########lyon.fr   */
+/*   Updated: 2020/12/14 06:30:33 by gbaud            ###   ########lyon.fr   */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,35 +32,32 @@ int		init_parameters(int ac, char **av, t_simulation *simulation)
 	simulation->start = get_time_ms();
 	if (!(simulation->philo = malloc(sizeof(t_philo) * simulation->nop)))
 		error("Malloc error", ALLOCATION);
+	if (!(simulation->pid = malloc(sizeof(pid_t) * simulation->nop)))
+		error("Malloc error", ALLOCATION);
 	return (0);
 }
 
 void	check_life(t_simulation *simulation)
 {
-	int i;
-	int j;
+	int		i;
+	int		status;
+	pid_t	tmp_pid;
 
-	while (1)
+	status = 0;
+	tmp_pid = -1;
+	while (!status && tmp_pid <= 0)
+		tmp_pid = waitpid(-1, &status, 0);
+	if (WEXITSTATUS(status))
 	{
 		i = -1;
-		j = 0;
 		while (++i < simulation->nop)
-		{
-			if (!simulation->philo[i].eat)
-				j++;
-			if (simulation->philo[i].eat && simulation->philo[i].ttd >= 0 &&
-				compare_time(simulation->philo[i].ttd))
-			{
-				log_died(simulation, i);
-				clean_exit(simulation);
-			}
-		}
-		if (j == simulation->nop)
-		{
-			log_end(simulation);
-			clean_exit(simulation);
-		}
+			if (tmp_pid != simulation->pid[i])
+				kill(simulation->pid[i], SIGKILL);
+			else
+				log_died(simulation, simulation->philo[i].id);
 	}
+	else
+		log_end(simulation);
 }
 
 void	setup_loop(t_simulation *simulation)
@@ -80,11 +77,9 @@ void	setup_loop(t_simulation *simulation)
 		simulation->philo[i].ittd = simulation->ttd;
 		simulation->philo[i].itte = simulation->tte;
 		simulation->philo[i].itts = simulation->tts;
-		pthread_create(&simulation->philo[i].thread, NULL, run,
-						&simulation->philo[i]);
-		pthread_detach(simulation->philo[i].thread);
-		pthread_join(simulation->philo[i].thread, NULL);
-		
+		simulation->pid[i] = fork();
+		if (!simulation->pid[i])
+			run(&simulation->philo[i]);
 	}
 }
 
@@ -108,5 +103,6 @@ int		main(int ac, char **av)
 		error("Erreur de semaphore", ALLOCATION);
 	setup_loop(&simulation);
 	check_life(&simulation);
+	clean_exit(&simulation);
 	return (0);
 }
